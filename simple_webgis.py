@@ -27,28 +27,28 @@ def index():
         logging.info("Acesso à rota principal /")
         logging.info("Iniciando criação do mapa")
         
-        # Criar mapa base
+    # Criar mapa base
         m = folium.Map(location=[-20.2976, -40.2958], zoom_start=13)
         logging.info("Mapa base criado com sucesso")
-        
+
         # Adicionar camada Google Satellite
-        folium.TileLayer(
-            tiles='https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+            folium.TileLayer(
+                tiles='https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
             attr='© Google',
-            name='Google Satellite',
-            overlay=False
-        ).add_to(m)
-        logging.info("Camada Google Satellite adicionada")
-        
+                name='Google Satellite',
+                overlay=False
+            ).add_to(m)
+            logging.info("Camada Google Satellite adicionada")
+
         # Adicionar camada OpenStreetMap
-        folium.TileLayer(
+    folium.TileLayer(
             tiles='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             attr='OpenStreetMap',
-            name='OpenStreetMap',
-            overlay=False
-        ).add_to(m)
-        logging.info("Camada OpenStreetMap adicionada")
-        
+        name='OpenStreetMap',
+                overlay=False
+    ).add_to(m)
+            logging.info("Camada OpenStreetMap adicionada")
+
         # Adicionar camada raster
         raster_path = os.path.join(os.path.dirname(__file__), 'uso do solo Vtoria.tif')
         logging.info(f"Verificando arquivo raster: {raster_path}")
@@ -57,64 +57,64 @@ def index():
         logging.info(f"Verificando arquivo auxiliar: {aux_path}")
         
         if os.path.exists(raster_path):
-            logging.info("Tentando abrir o arquivo raster...")
+        logging.info("Tentando abrir o arquivo raster...")
             with rasterio.open(raster_path) as src:
                 # Ler dados
                 data = src.read(1)
-                logging.info(f"Dados lidos com sucesso. Formato: {data.shape}")
+                    logging.info(f"Dados lidos com sucesso. Formato: {data.shape}")
                 
                 # Obter valores únicos
                 unique_values = np.unique(data)
                 logging.info(f"Valores únicos: {unique_values}")
-                
+                    
                 # Obter limites do raster
                 bounds = src.bounds
-                logging.info(f"Limites do raster: {bounds}")
-                
+                    logging.info(f"Limites do raster: {bounds}")
+            
                 # Normalizar dados para visualização
                 data_normalized = np.zeros_like(data, dtype=np.uint8)
                 data_normalized[data == 0] = 0  # Água
                 data_normalized[data == 3] = 85  # Área Urbana
                 data_normalized[data == 5] = 170  # Vegetação
                 data_normalized[data == 9] = 255  # Solo Exposto
-                
-                # Adicionar ao mapa
-                folium.raster_layers.ImageOverlay(
+            
+            # Adicionar ao mapa
+            folium.raster_layers.ImageOverlay(
                     image=data_normalized,
                     bounds=[[bounds.bottom, bounds.left], [bounds.top, bounds.right]],
                     opacity=0.7,
-                    name='Uso do Solo',
+                name='Uso do Solo',
                     colormap=lambda x: [
                         (0, 0, 255, 255),  # Água - Azul
                         (255, 0, 0, 255),  # Área Urbana - Vermelho
                         (0, 255, 0, 255),  # Vegetação - Verde
                         (255, 255, 0, 255)  # Solo Exposto - Amarelo
                     ][int(x * 3)]
-                ).add_to(m)
-                logging.info("Camada raster adicionada ao mapa com sucesso")
-                
-                # Adicionar legenda
-                legend_html = '''
+            ).add_to(m)
+                        logging.info("Camada raster adicionada ao mapa com sucesso")
+            
+            # Adicionar legenda
+            legend_html = '''
                     <div style="position: fixed; bottom: 50px; left: 50px; z-index: 1000; background-color: white; padding: 10px; border: 2px solid grey; border-radius: 5px;">
-                        <h4>Uso do Solo</h4>
+            <h4>Uso do Solo</h4>
                         <p style="color: blue;">0 - Água</p>
                         <p style="color: red;">3 - Área Urbana</p>
                         <p style="color: green;">5 - Vegetação</p>
                         <p style="color: yellow;">9 - Solo Exposto</p>
                     </div>
-                '''
-                m.get_root().html.add_child(folium.Element(legend_html))
-                logging.info("Legenda adicionada com sucesso")
+            '''
+            m.get_root().html.add_child(folium.Element(legend_html))
+                        logging.info("Legenda adicionada com sucesso")
         else:
             logging.warning(f"Arquivo raster não encontrado: {raster_path}")
-        
-        # Adicionar controle de camadas
-        folium.LayerControl().add_to(m)
-        logging.info("Controle de camadas adicionado")
+
+    # Adicionar controle de camadas
+    folium.LayerControl().add_to(m)
+            logging.info("Controle de camadas adicionado")
         
         # Gerar HTML
         html = m.get_root().render()
-        logging.info("Template HTML gerado com sucesso")
+            logging.info("Template HTML gerado com sucesso")
         
         logging.info("Fim do processamento da rota principal /")
         return html
