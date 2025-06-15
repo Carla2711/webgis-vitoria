@@ -17,20 +17,10 @@
         // Criar mapa base
         var map = L.map('map').setView([-20.2976, -40.2958], 13);
 
-        // Adicionar camada Google Satellite
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Esri',
-            name: 'Google Satellite'
-        }).addTo(map);
-
         // Adicionar camada OpenStreetMap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'OpenStreetMap',
-            name: 'OpenStreetMap'
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-
-        // Adicionar controle de camadas
-        L.control.layers().addTo(map);
     </script>
 </body>
 </html> 
