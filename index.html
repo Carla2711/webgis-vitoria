@@ -19,6 +19,20 @@
             border: 2px solid grey;
             border-radius: 5px;
         }
+        .warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            text-align: center;
+            max-width: 80%;
+        }
     </style>
 </head>
 <body>
@@ -30,13 +44,18 @@
         <p>5 - Vegetação</p>
         <p>9 - Solo Exposto</p>
     </div>
+    <div class="warning" id="warning">
+        <h3>Atenção</h3>
+        <p>Para visualizar o mapa de uso do solo, é necessário converter o arquivo .tif para um formato web-friendly (PNG ou JPG).</p>
+        <p>Por favor, converta o arquivo "uso do solo Vtoria.tif" usando QGIS ou outro software GIS e atualize o caminho no código.</p>
+    </div>
     <script>
         // Criar mapa base
         var map = L.map('map').setView([-20.2976, -40.2958], 13);
 
         // Adicionar camada Google Satellite
-        var googleSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri',
+        var googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            attribution: '© Google',
             name: 'Google Satellite'
         });
 
@@ -47,9 +66,9 @@
         });
 
         // Adicionar camada de uso do solo
-        var usoDoSolo = L.imageOverlay('uso do solo Vtoria.tif', [
-            [-21.301660501, -41.87972804],  // [south, west]
-            [-17.892015008, -28.847778382]  // [north, east]
+        var usoDoSolo = L.imageOverlay('C:/Users/Carla/Desktop/Cursos/QGIS 2025/uso do solo Vtoria.tif', [
+            [-20.2976 - 0.2, -40.2958 - 0.2],  // [south, west]
+            [-20.2976 + 0.2, -40.2958 + 0.2]   // [north, east]
         ], {
             opacity: 0.7,
             name: 'Uso do Solo'
@@ -71,6 +90,34 @@
         };
 
         L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+        // Função para tentar carregar o mapa de uso do solo
+        function loadUsoDoSolo() {
+            var usoDoSolo = L.imageOverlay('./uso do solo Vtoria.tif', [
+                [-20.2976 - 0.1, -40.2958 - 0.1],  // [south, west]
+                [-20.2976 + 0.1, -40.2958 + 0.1]   // [north, east]
+            ], {
+                opacity: 0.7,
+                name: 'Uso do Solo'
+            });
+
+            usoDoSolo.on('error', function() {
+                document.getElementById('warning').style.display = 'block';
+            });
+
+            usoDoSolo.on('load', function() {
+                document.getElementById('warning').style.display = 'none';
+                var overlayMaps = {
+                    "Uso do Solo": usoDoSolo
+                };
+                L.control.layers(baseMaps, overlayMaps).addTo(map);
+            });
+
+            usoDoSolo.addTo(map);
+        }
+
+        // Tentar carregar o mapa de uso do solo
+        loadUsoDoSolo();
     </script>
 </body>
 </html> 
