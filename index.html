@@ -9,18 +9,68 @@
     <style>
         body { margin: 0; padding: 0; }
         #map { width: 100%; height: 100vh; }
+        .legend {
+            position: fixed;
+            bottom: 50px;
+            left: 50px;
+            z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border: 2px solid grey;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div class="legend">
+        <h4>Uso do Solo</h4>
+        <p>0 - Água</p>
+        <p>3 - Área Urbana</p>
+        <p>5 - Vegetação</p>
+        <p>9 - Solo Exposto</p>
+    </div>
     <script>
         // Criar mapa base
         var map = L.map('map').setView([-20.2976, -40.2958], 13);
 
+        // Adicionar camada Google Satellite
+        var googleSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri',
+            name: 'Google Satellite'
+        });
+
         // Adicionar camada OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            name: 'OpenStreetMap'
+        });
+
+        // Adicionar camada de uso do solo
+        var usoDoSolo = L.imageOverlay('uso do solo Vtoria.tif', [
+            [-21.301660501, -41.87972804],  // [south, west]
+            [-17.892015008, -28.847778382]  // [north, east]
+        ], {
+            opacity: 0.7,
+            name: 'Uso do Solo'
+        });
+
+        // Adicionar camadas ao mapa
+        osm.addTo(map);
+        googleSat.addTo(map);
+        usoDoSolo.addTo(map);
+
+        // Adicionar controle de camadas
+        var baseMaps = {
+            "OpenStreetMap": osm,
+            "Google Satellite": googleSat
+        };
+
+        var overlayMaps = {
+            "Uso do Solo": usoDoSolo
+        };
+
+        L.control.layers(baseMaps, overlayMaps).addTo(map);
     </script>
 </body>
 </html> 
